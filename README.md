@@ -1,11 +1,10 @@
-# TP_AA1_Grando_Tardugno_Diaz
+# AA1-TUIA-Diaz-Tardugno-Ferreira
 
 Trabajos prácticos de **Aprendizaje Automático 1**, Tecnicatura en Inteligencia
 Artificial, FCEIA, UNR. Cuatrimestre 2, 2026.
 
 ## Integrantes
 
-- Sofia Grando
 - Amanda Tardugno
 - Lucas Díaz
 - Facundo Ferreira
