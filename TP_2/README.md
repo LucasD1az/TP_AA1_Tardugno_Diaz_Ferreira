@@ -28,7 +28,7 @@ Con el entorno activado (ver el [README del repositorio](../README.md)):
 jupyter notebook TP-clasificacion-AA1.ipynb
 ```
 
-El notebook lee el dataset y la tabla de coordenadas desde esta misma carpeta y se ejecuta de principio a fin en orden, sin pasos manuales intermedios. La semilla está fijada, así que los números son los mismos en cada corrida. Casi todo el tiempo de una corrida se va en la imputación por regresión, que se ajusta dos veces: una en la comparación de métodos y otra en el preprocesamiento final.
+El notebook lee el dataset y la tabla de coordenadas desde esta misma carpeta y se ejecuta de principio a fin en orden, sin pasos manuales intermedios. La semilla está fijada, así que los números son los mismos en cada corrida. Una corrida completa tarda unos 16 minutos, casi todos en la imputación por regresión: se ajusta en la comparación de métodos, en el preprocesamiento final y, en la búsqueda de hiperparámetros, una vez por cada combinación y fold.
 
 ## Cómo está organizado el notebook
 
@@ -60,6 +60,16 @@ La clase positiva es la lluvia, y un falso negativo (no avisar y que llueva) se 
 
 Siempre "No" (accuracy 0,776, no detecta ninguna lluvia), aleatorio con la proporción de lluvia de entrenamiento (recall 0,225, sobre la diagonal de la curva ROC) y persistencia: mañana llueve si hoy llovió más de 1 mm (recall 0,443). Con la misma tasa de falsas alarmas que la persistencia, la regresión logística detecta el 71,1% de las lluvias contra el 44,3%. Su log loss (0,359) es un tercio menor que la de darle a todos los días la proporción de lluvia de entrenamiento (0,532).
 
+### Optimización de hiperparámetros
+
+Grid search sobre `C` (de 0,001 a 10, en escala logarítmica) y el tipo de penalización (`l1_ratio` 0, 0,5 y 1: L2, elastic net y L1), con el preprocesamiento completo dentro del `Pipeline` para que se ajuste en cada fold.
+
+- La validación cruzada respeta el orden temporal, por el mismo motivo que la división: cinco folds que validan cada uno un año (2010 a 2014) y entrenan con todos los anteriores. Se arman por fecha y no con `TimeSeriesSplit`, que corta por fila y podría partir un mismo día entre ciudades.
+- El umbral se vuelve a elegir para cada combinación y en cada fold, con el mismo criterio (máximo recall con precisión de al menos 0,5): cambiar los hiperparámetros cambia las probabilidades.
+- Gana `C` = 1 con L2, el modelo del ítem 2, en un empate con todas las combinaciones de `C` ≥ 1 (recall medio 0,810, desvío entre años 0,03). Regularizar más pierde año por año, y L1 sólo descarta `MaxTemp` antes de empezar a perder recall.
+- Reajustado y con el umbral elegido otra vez en validación, vuelve a dar 0,19 y los mismos errores. El modelo final no cambia, así que no se vuelve a mirar prueba.
+- Año a año, el umbral que cumple el piso sube de 0,18 a 0,22 a medida que baja la proporción de lluvia (24,4% a 20,4%), y el 0,19 de validación queda en ese rango.
+
 ## Estado
 
 | Ítem de la consigna | Estado |
@@ -67,7 +77,7 @@ Siempre "No" (accuracy 0,776, no detecta ninguna lluvia), aleatorio con la propo
 | 1. Análisis descriptivo y preprocesamiento | Completo |
 | 2. Regresión logística | Completo |
 | 3. Modelo base | Completo |
-| 4. Optimización de hiperparámetros | Pendiente |
+| 4. Optimización de hiperparámetros | Completo |
 | 5. Explicabilidad | Pendiente |
 | 6. AutoML con PyCaret | Pendiente |
 | 7. Red neuronal | Pendiente |
