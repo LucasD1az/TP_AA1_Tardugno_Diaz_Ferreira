@@ -16,6 +16,7 @@ Como la variable a predecir es una de dos categorías, es un problema de clasifi
 | `weatherAUS_2026C2.csv` | Dataset: 145.412 filas y 25 columnas, 49 ciudades entre 2007 y 2017 |
 | `coordenadas_ciudades.csv` | Latitud, longitud, altura y distancia a la costa de la estación meteorológica de cada ciudad. La lee el notebook |
 | `coordenadas/` | El notebook que arma y controla la tabla de coordenadas (`coordenadas.ipynb`), las copias del listado de estaciones y de la línea de costa que usa, y un [README](coordenadas/README.md) con el resumen de cómo se eligió cada estación |
+| `automl/` | El notebook de PyCaret (`automl_pycaret.ipynb`), que corre en su propio entorno con Python 3.11, los datos preprocesados que recibe, sus resultados y un [README](automl/README.md) con cómo armar el entorno |
 | `TrabajoPrácticoClasificacionAA1_2026C2.pdf` | Consigna de la cátedra |
 
 Las definiciones de las variables son las de la [descripción del dataset en Kaggle](https://www.kaggle.com/datasets/arunavakrchakraborty/australia-weather-data/data).
@@ -70,6 +71,24 @@ Grid search sobre `C` (de 0,001 a 10, en escala logarítmica) y el tipo de penal
 - Reajustado y con el umbral elegido otra vez en validación, vuelve a dar 0,19 y los mismos errores. El modelo final no cambia, así que no se vuelve a mirar prueba.
 - Año a año, el umbral que cumple el piso sube de 0,18 a 0,22 a medida que baja la proporción de lluvia (24,4% a 20,4%), y el 0,19 de validación queda en ese rango.
 
+### Explicabilidad
+
+SHAP sobre el modelo elegido, en validación, con `LinearExplainer` y todo entrenamiento como referencia. Se verifica que cada contribución es el coeficiente por la distancia a la media de entrenamiento y que el valor base más las contribuciones da el logit del modelo.
+
+- Dos gráficos globales (importancia media y beeswarm) y dos locales (waterfall del día de lluvia con menor probabilidad, un falso negativo, y del de mayor probabilidad).
+- Por separado, las variables más importantes son las dos presiones, pero empujan en sentidos opuestos: tienen correlación 0,958 y el modelo usa sobre todo cuánto bajó la presión durante el día. Juntas pesan cinco veces menos que la suma de las dos por separado.
+- Agrupando las variables que salen del mismo dato, las más importantes son la humedad, la ráfaga máxima, las horas de sol y la presión. Las menos importantes son `Evaporation` y las direcciones del viento. `MinTemp` y `MaxTemp` pesan poco porque `Temp9am` y `Temp3pm` llevan casi la misma información.
+- El peor falso negativo (WaggaWagga, 16/4/2015) no tenía ninguna señal de lluvia: humedad de 19,8% a la tarde, presión alta y 10,6 horas de sol. Los días de lluvia sin aviso tienen lluvias más débiles que los avisados (mediana de 3,0 mm contra 5,0 mm).
+
+### AutoML con PyCaret
+
+PyCaret corre en un notebook y un entorno aparte (Python 3.11, ver [`automl/README.md`](automl/README.md)), con los datos ya preprocesados por el `Pipeline`, los mismos folds por año de la búsqueda de hiperparámetros y la misma métrica, agregada con `add_metric`. Su regresión logística reproduce la nuestra.
+
+- Cuatro conjuntos de árboles superan a la regresión logística en validación cruzada (recall 0,810): LightGBM (0,850), Extra Trees, random forest y gradient boosting, todos con mayor AUC. LightGBM gana en los cinco años.
+- En validación, con su umbral (0,16), LightGBM detecta el 83,7% de las lluvias contra el 79,5% con la misma precisión: 128 lluvias más avisadas a cambio de 117 falsas alarmas más.
+- Con sus valores por defecto (accuracy, umbral 0,5), los mejores modelos detectan la mitad de las lluvias. SVM lineal y Ridge no dan probabilidades y no se pueden medir con el criterio.
+- No se cambia el modelo elegido ni se mira prueba: eso queda para la comparación de modelos.
+
 ## Estado
 
 | Ítem de la consigna | Estado |
@@ -78,8 +97,8 @@ Grid search sobre `C` (de 0,001 a 10, en escala logarítmica) y el tipo de penal
 | 2. Regresión logística | Completo |
 | 3. Modelo base | Completo |
 | 4. Optimización de hiperparámetros | Completo |
-| 5. Explicabilidad | Pendiente |
-| 6. AutoML con PyCaret | Pendiente |
+| 5. Explicabilidad | Completo |
+| 6. AutoML con PyCaret | Completo |
 | 7. Red neuronal | Pendiente |
 | 8. Comparación de modelos | Pendiente |
 | 9. MLOps | Pendiente |

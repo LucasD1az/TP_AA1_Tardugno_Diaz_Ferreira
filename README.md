@@ -78,7 +78,13 @@ forma directa, no sus dependencias internas:
 ```
 ipykernel      jupyter        matplotlib
 numpy          pandas         scikit-learn      seaborn
+shap
 ```
+
+PyCaret, que usa el ítem 6 del TP 2, no entra en este entorno: necesita Python
+3.11 y versiones viejas de scikit-learn y pandas. Corre en un entorno aparte,
+`.venv-pycaret/`, con sus propias instrucciones en
+[`TP_2/automl/README.md`](TP_2/automl/README.md).
 
 Si se suma una biblioteca nueva, se la agrega a mano al archivo con la versión
 que quedó instalada. Para averiguarla:

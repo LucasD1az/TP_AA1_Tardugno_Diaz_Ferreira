@@ -7,3 +7,9 @@
 # Python
 __pycache__/
 *.pyc
+
+# Entorno de PyCaret (Python 3.11, ver TP_2/automl/README.md)
+.venv-pycaret/
+
+# Log que PyCaret escribe en cada corrida
+logs.log
