@@ -16,9 +16,11 @@ scikit-learn a 1.4.2 y pandas a 2.1.4. El notebook del TP usa Python 3.12, sciki
 | `requirements.txt` | Las bibliotecas del entorno de PyCaret |
 | `datos/entrenamiento.csv.gz` | Entrenamiento ya preprocesado, con el año de cada día y `RainTomorrow`. Lo escribe el notebook del TP |
 | `datos/validacion.csv.gz` | Validación ya preprocesada, con `RainTomorrow`. Lo escribe el notebook del TP |
+| `datos/recall_busqueda.csv` | El recall de cada año de la regresión logística (`C` = 1, L2) en la búsqueda de hiperparámetros, para controlar que PyCaret mida igual. Lo escribe el notebook del TP |
 | `resultados/comparacion.csv` | Las métricas de cada modelo, promediadas en los cinco folds por año |
 | `resultados/recall_por_anio.csv` | El recall con precisión de al menos 0,5 de los tres mejores modelos y de la regresión logística, en cada año |
 | `resultados/probabilidades_validacion.csv.gz` | La probabilidad de lluvia que cada uno de esos modelos le asigna a cada día de validación |
+| `resultados/probabilidades_adaboost.csv.gz` | La probabilidad de lluvia que AdaBoost le asigna a cada día de validación, para revisar por qué no se puede medir con el criterio |
 
 Prueba no se exporta: no participa de ninguna decisión.
 
@@ -54,6 +56,8 @@ En VS Code, elegir **Python 3.11 (PyCaret)** como kernel de `automl_pycaret.ipyn
 notebook del TP). `.venv-pycaret/` no se versiona, igual que `.venv/`.
 
 `six` está en `requirements.txt` aunque el notebook no la use: PyCaret la necesita al importarse y no
-la instala sola.
+la instala sola. `lightgbm` está fijada en 4.6.0 porque PyCaret no la limita y la 4.7.0 falla en
+Windows al entrenar dentro de PyCaret: el error queda sólo en `logs.log` y PyCaret saca a LightGBM de la
+comparación sin avisar.
 
 Una corrida completa de `automl_pycaret.ipynb` tarda unos 5 minutos.
