@@ -1,8 +1,9 @@
 # AutoML con PyCaret
 
-El ítem 6 del TP compara la regresión logística con los modelos que prueba PyCaret. La comparación corre
-en [`automl_pycaret.ipynb`](automl_pycaret.ipynb), en esta carpeta, y la lectura de los resultados está
-en la sección "AutoML con PyCaret" del [notebook del TP](../TP-clasificacion-AA1.ipynb).
+El ítem 6 del TP compara la regresión logística con los modelos que prueba PyCaret, y el ítem 8 vuelve a
+medir los mejores en prueba. Los modelos corren en [`automl_pycaret.ipynb`](automl_pycaret.ipynb), en
+esta carpeta, y la lectura de los resultados está en las secciones "AutoML con PyCaret" y "Comparación de
+modelos" del [notebook del TP](../TP-clasificacion-AA1.ipynb).
 
 Está aparte porque PyCaret 3.3.2, la última versión, sólo funciona con Python 3.9 a 3.11, y baja
 scikit-learn a 1.4.2 y pandas a 2.1.4. El notebook del TP usa Python 3.12, scikit-learn 1.9.1 y pandas
@@ -16,17 +17,22 @@ scikit-learn a 1.4.2 y pandas a 2.1.4. El notebook del TP usa Python 3.12, sciki
 | `requirements.txt` | Las bibliotecas del entorno de PyCaret |
 | `datos/entrenamiento.csv.gz` | Entrenamiento ya preprocesado, con el año de cada día y `RainTomorrow`. Lo escribe el notebook del TP |
 | `datos/validacion.csv.gz` | Validación ya preprocesada, con `RainTomorrow`. Lo escribe el notebook del TP |
+| `datos/prueba.csv.gz` | Prueba ya preprocesada, con `RainTomorrow`. Lo escribe el notebook del TP en la comparación de modelos |
 | `datos/recall_busqueda.csv` | El recall de cada año de la regresión logística (`C` = 1, L2) en la búsqueda de hiperparámetros, para controlar que PyCaret mida igual. Lo escribe el notebook del TP |
 | `resultados/comparacion.csv` | Las métricas de cada modelo, promediadas en los cinco folds por año |
 | `resultados/recall_por_anio.csv` | El recall con precisión de al menos 0,5 de los tres mejores modelos y de la regresión logística, en cada año |
 | `resultados/probabilidades_validacion.csv.gz` | La probabilidad de lluvia que cada uno de esos modelos le asigna a cada día de validación |
+| `resultados/probabilidades_prueba.csv.gz` | La probabilidad de lluvia que esos mismos modelos le asignan a cada día de prueba, para la comparación de modelos |
 | `resultados/probabilidades_adaboost.csv.gz` | La probabilidad de lluvia que AdaBoost le asigna a cada día de validación, para revisar por qué no se puede medir con el criterio |
 
-Prueba no se exporta: no participa de ninguna decisión.
+Prueba no participa de ninguna decisión del ítem 6: el notebook del TP la exporta recién en la
+comparación de modelos, y `automl_pycaret.ipynb` la usa sólo en su última sección, para calcular las
+probabilidades de prueba.
 
 ## Orden de ejecución
 
-1. El notebook del TP, hasta la celda que exporta los datos a `datos/` (sección "AutoML con PyCaret").
+1. El notebook del TP, hasta la celda que exporta entrenamiento y validación a `datos/` (sección
+   "AutoML con PyCaret"), y la que exporta prueba (sección "Comparación de modelos").
 2. `automl_pycaret.ipynb`, con el entorno de esta carpeta. Escribe `resultados/`.
 3. El resto del notebook del TP, que lee `resultados/`.
 

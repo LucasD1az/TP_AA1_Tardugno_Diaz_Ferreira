@@ -99,6 +99,14 @@ Red densa con Keras (TensorFlow), sobre las mismas 28 columnas preprocesadas: ca
 - SHAP con permutaciones sobre el logit de la red, en 1.000 días de validación. Las variables principales son las mismas que en la regresión logística y empujan en el mismo sentido. Cambia la forma: las horas de sol pesan poco hasta que el día es muy soleado, las ráfagas extremas dejan de sumar, y la ubicación pasa del noveno al quinto grupo en importancia.
 - El peor falso negativo de la regresión logística (WaggaWagga) la red también lo pierde, con más seguridad: no había señal de lluvia en las variables del día.
 
+### Comparación de modelos
+
+Todos los modelos en prueba con una sola métrica: el recall de la lluvia con precisión de al menos 0,5, el criterio con el que se eligieron umbrales e hiperparámetros desde el principio. En prueba el umbral se vuelve a elegir con ese criterio, así que la métrica es un punto de la curva de precisión y recall de cada modelo y, como el AUC, no depende de un umbral fijado antes. Lo que da cada modelo con su umbral de validación se muestra aparte. Las probabilidades de prueba de los modelos de PyCaret se calculan en su notebook.
+
+- Gana la red optimizada (0,846), seguida de LightGBM (0,836), la primera red (0,834), Extra Trees (0,823) y random forest (0,819). Las dos regresiones logísticas quedan en 0,787 y 0,790. Los modelos base no llegan al piso de precisión y cuentan con cero.
+- La ventaja de la red sobre LightGBM es chica, pero se repite en los folds, en validación y en prueba, y gana en 2016 y 2017, el 90% de prueba.
+- Con el umbral de validación ningún modelo llega en prueba a la precisión de 0,5: todos los umbrales de prueba son entre 0,01 y 0,04 más altos. La red, con 0,19, queda en precisión 0,494 y recall 0,854. El umbral no se corrige con prueba.
+
 ## Estado
 
 | Ítem de la consigna | Estado |
@@ -110,7 +118,7 @@ Red densa con Keras (TensorFlow), sobre las mismas 28 columnas preprocesadas: ca
 | 5. Explicabilidad | Completo |
 | 6. AutoML con PyCaret | Completo |
 | 7. Red neuronal | Completo |
-| 8. Comparación de modelos | Pendiente |
+| 8. Comparación de modelos | Completo |
 | 9. MLOps | Pendiente |
 | 10. Conclusión | Pendiente |
 
