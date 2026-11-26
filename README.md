@@ -21,7 +21,8 @@ correr el notebook. Las instrucciones de entorno de acá abajo valen para todas.
 
 ## Preparar el entorno
 
-Requiere **Python 3.12**. Las dependencias se instalan en un entorno virtual
+Requiere **Python 3.12**. Con Python 3.14 no se puede instalar TensorFlow, que
+usa la red neuronal del TP 2. Las dependencias se instalan en un entorno virtual
 (`.venv/`), que no se versiona: cada uno lo crea en su máquina.
 
 ### Crearlo (una sola vez)
@@ -77,8 +78,8 @@ forma directa, no sus dependencias internas:
 
 ```
 ipykernel      jupyter        matplotlib
-numpy          pandas         scikit-learn      seaborn
-shap
+numpy          optuna         pandas            scikit-learn
+seaborn        shap           tensorflow
 ```
 
 PyCaret, que usa el ítem 6 del TP 2, no entra en este entorno: necesita Python

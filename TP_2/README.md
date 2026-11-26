@@ -29,7 +29,7 @@ Con el entorno activado (ver el [README del repositorio](../README.md)):
 jupyter notebook TP-clasificacion-AA1.ipynb
 ```
 
-El notebook lee el dataset y la tabla de coordenadas desde esta misma carpeta y se ejecuta de principio a fin en orden, sin pasos manuales intermedios. La semilla está fijada, así que los números son los mismos en cada corrida. Una corrida completa tarda unos 16 minutos, casi todos en la imputación por regresión: se ajusta en la comparación de métodos, en el preprocesamiento final y, en la búsqueda de hiperparámetros, una vez por cada combinación y fold.
+El notebook lee el dataset y la tabla de coordenadas desde esta misma carpeta y se ejecuta de principio a fin en orden, sin pasos manuales intermedios. La semilla está fijada, y TensorFlow corre con operaciones deterministas, así que los números son los mismos en cada corrida. Una corrida completa tarda alrededor de 70 minutos. Unos 35 son la búsqueda de hiperparámetros de la red neuronal (200 redes: 40 intentos por cinco folds). Casi todo el resto es la imputación por regresión, que se ajusta en la comparación de métodos, en el preprocesamiento final y, en la búsqueda de hiperparámetros de la regresión logística, una vez por cada combinación y fold.
 
 ## Cómo está organizado el notebook
 
@@ -89,6 +89,16 @@ PyCaret corre en un notebook y un entorno aparte (Python 3.11, ver [`automl/READ
 - Con sus valores por defecto (accuracy, umbral 0,5), los mejores modelos detectan la mitad de las lluvias. SVM lineal y Ridge no dan probabilidades y no se pueden medir con el criterio.
 - No se cambia el modelo elegido ni se mira prueba: eso queda para la comparación de modelos.
 
+### Red neuronal
+
+Red densa con Keras (TensorFlow), sobre las mismas 28 columnas preprocesadas: capas ocultas ReLU, salida sigmoide y entropía cruzada binaria (la log loss), sin pesos de clase, con el umbral elegido con el mismo criterio.
+
+- Una primera red sin ajustar (32 y 16 neuronas) ya supera a la regresión logística en validación: recall 0,831 contra 0,795 con la misma precisión, AUC 0,894 contra 0,872. La pérdida de validación toca su mínimo en la época 16 y después se estanca mientras la de entrenamiento sigue bajando.
+- Búsqueda bayesiana con Optuna (40 intentos) sobre capas, neuronas, dropout, learning rate y épocas, medida en los mismos folds por año. Gana una red de dos capas (104 y 127 neuronas, dropout 0,35, 22 épocas) con recall medio 0,859. Los diez mejores intentos quedan a menos de 0,006 entre sí. La red le gana a la regresión logística en los cinco años, y a LightGBM por poco.
+- En validación, con su umbral (0,19), detecta el 84,3% de las lluvias: 147 más que la regresión logística a cambio de 130 falsas alarmas más. Contra LightGBM es prácticamente un empate (0,843 contra 0,837). Tiene el mayor AUC (0,897) y la menor log loss (0,317).
+- SHAP con permutaciones sobre el logit de la red, en 1.000 días de validación. Las variables principales son las mismas que en la regresión logística y empujan en el mismo sentido. Cambia la forma: las horas de sol pesan poco hasta que el día es muy soleado, las ráfagas extremas dejan de sumar, y la ubicación pasa del noveno al quinto grupo en importancia.
+- El peor falso negativo de la regresión logística (WaggaWagga) la red también lo pierde, con más seguridad: no había señal de lluvia en las variables del día.
+
 ## Estado
 
 | Ítem de la consigna | Estado |
@@ -99,7 +109,7 @@ PyCaret corre en un notebook y un entorno aparte (Python 3.11, ver [`automl/READ
 | 4. Optimización de hiperparámetros | Completo |
 | 5. Explicabilidad | Completo |
 | 6. AutoML con PyCaret | Completo |
-| 7. Red neuronal | Pendiente |
+| 7. Red neuronal | Completo |
 | 8. Comparación de modelos | Pendiente |
 | 9. MLOps | Pendiente |
 | 10. Conclusión | Pendiente |
