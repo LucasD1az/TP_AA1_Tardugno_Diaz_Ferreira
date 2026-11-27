@@ -14,3 +14,6 @@ __pycache__/
 
 # Log que PyCaret escribe en cada corrida
 logs.log
+
+# Salida que genera la prueba del README de docker/
+TP_2/docker/ejemplo_salida.csv

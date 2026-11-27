@@ -17,6 +17,7 @@ Como la variable a predecir es una de dos categorías, es un problema de clasifi
 | `coordenadas_ciudades.csv` | Latitud, longitud, altura y distancia a la costa de la estación meteorológica de cada ciudad. La lee el notebook |
 | `coordenadas/` | El notebook que arma y controla la tabla de coordenadas (`coordenadas.ipynb`), las copias del listado de estaciones y de la línea de costa que usa, y un [README](coordenadas/README.md) con el resumen de cómo se eligió cada estación |
 | `automl/` | El notebook de PyCaret (`automl_pycaret.ipynb`), que corre en su propio entorno con Python 3.11, los datos preprocesados que recibe, sus resultados y un [README](automl/README.md) con cómo armar el entorno |
+| `docker/` | La puesta en producción del modelo elegido: el script de inferencia, los archivos del modelo que guarda el notebook, el `Dockerfile` y un [README](docker/README.md) con cómo armar la imagen y correr el contenedor |
 | `TrabajoPrácticoClasificacionAA1_2026C2.pdf` | Consigna de la cátedra |
 
 Las definiciones de las variables son las de la [descripción del dataset en Kaggle](https://www.kaggle.com/datasets/arunavakrchakraborty/australia-weather-data/data).
@@ -29,7 +30,7 @@ Con el entorno activado (ver el [README del repositorio](../README.md)):
 jupyter notebook TP-clasificacion-AA1.ipynb
 ```
 
-El notebook lee el dataset y la tabla de coordenadas desde esta misma carpeta y se ejecuta de principio a fin en orden, sin pasos manuales intermedios. La semilla está fijada, y TensorFlow corre con operaciones deterministas, así que los números son los mismos en cada corrida. Una corrida completa tarda alrededor de 70 minutos. Unos 35 son la búsqueda de hiperparámetros de la red neuronal (200 redes: 40 intentos por cinco folds). Casi todo el resto es la imputación por regresión, que se ajusta en la comparación de métodos, en el preprocesamiento final y, en la búsqueda de hiperparámetros de la regresión logística, una vez por cada combinación y fold.
+El notebook lee el dataset y la tabla de coordenadas desde esta misma carpeta y se ejecuta de principio a fin en orden, sin pasos manuales intermedios. La semilla está fijada, y TensorFlow corre con operaciones deterministas, así que en la misma computadora los números son los mismos en cada corrida. En otra computadora la red neuronal puede entrenarse distinto, porque el resultado depende del orden en que el procesador hace las sumas, y con ella cambian los números de la red y de la comparación de modelos. Los archivos del modelo en `docker/` son los de la corrida guardada en el notebook. Una corrida completa tarda alrededor de 70 minutos. Unos 35 son la búsqueda de hiperparámetros de la red neuronal (200 redes: 40 intentos por cinco folds). Casi todo el resto es la imputación por regresión, que se ajusta en la comparación de métodos, en el preprocesamiento final y, en la búsqueda de hiperparámetros de la regresión logística, una vez por cada combinación y fold.
 
 ## Cómo está organizado el notebook
 
@@ -107,6 +108,15 @@ Todos los modelos en prueba con una sola métrica: el recall de la lluvia con pr
 - La ventaja de la red sobre LightGBM es chica, pero se repite en los folds, en validación y en prueba, y gana en 2016 y 2017, el 90% de prueba.
 - Con el umbral de validación ningún modelo llega en prueba a la precisión de 0,5: todos los umbrales de prueba son entre 0,01 y 0,04 más altos. La red, con 0,19, queda en precisión 0,494 y recall 0,854. El umbral no se corrige con prueba.
 
+### MLOps
+
+El modelo elegido, la red optimizada con umbral 0,19, se pone en producción con Docker en [`docker/`](docker/README.md).
+
+- El notebook guarda tres archivos: el `Pipeline` de preprocesamiento con joblib, la red en el formato de Keras y el umbral en un JSON. `inferencia.py` los carga y sólo transforma y predice, sin ningún `fit`.
+- Tres pasos del pipeline son funciones del notebook, de las que joblib guarda sólo el nombre. Están copiadas en `transformaciones.py`, y el notebook verifica que `inferencia.py` da las mismas probabilidades y avisos que la red en los 28.048 días de prueba.
+- La imagen parte de Python 3.12 e instala sólo lo de la inferencia, con las versiones con las que se entrenó (`tensorflow-cpu` en lugar de `tensorflow`). La entrada y la salida son CSV, en una carpeta que se monta en el contenedor.
+- La red no se vuelve a entrenar para desplegar: en otra computadora sale distinta, así que producción usa el archivo guardado.
+
 ## Estado
 
 | Ítem de la consigna | Estado |
@@ -119,7 +129,7 @@ Todos los modelos en prueba con una sola métrica: el recall de la lluvia con pr
 | 6. AutoML con PyCaret | Completo |
 | 7. Red neuronal | Completo |
 | 8. Comparación de modelos | Completo |
-| 9. MLOps | Pendiente |
+| 9. MLOps | Completo (falta correr el notebook para generar los archivos del modelo) |
 | 10. Conclusión | Pendiente |
 
 Entregas parciales: ítems 1 a 3 hasta el 30/10, 4 a 6 hasta el 13/11, y 7 a 10 hasta el 27/11.
