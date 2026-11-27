@@ -129,7 +129,7 @@ El modelo elegido, la red optimizada con umbral 0,19, se pone en producción con
 | 6. AutoML con PyCaret | Completo |
 | 7. Red neuronal | Completo |
 | 8. Comparación de modelos | Completo |
-| 9. MLOps | Completo (falta correr el notebook para generar los archivos del modelo) |
-| 10. Conclusión | Pendiente |
+| 9. MLOps | Completo |
+| 10. Conclusión | Completo |
 
 Entregas parciales: ítems 1 a 3 hasta el 30/10, 4 a 6 hasta el 13/11, y 7 a 10 hasta el 27/11.
